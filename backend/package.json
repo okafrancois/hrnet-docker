@@ -20,10 +20,10 @@
     "yamljs": "^0.3.0"
   },
   "scripts": {
-    "dev:server": "nodemon ./server/server.js",
-    "populate:user": "node ./server/scripts/populateUsers.js",
-    "populate:employees": "node ./server/scripts/populateEmployees.js",
-    "server": "node ./server/server.js"
+    "dev:server": "nodemon server/server.js",
+    "populate:user": "node server/scripts/populateUsers.js",
+    "populate:employees": "node server/scripts/populateEmployees.js",
+    "server": "node server/server.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
