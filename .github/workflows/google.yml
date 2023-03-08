@@ -1,88 +1,42 @@
-# Ce workflow utilise des actions qui ne sont pas certifiées par GitHub.
-# Elles sont fournies par un tiers et régies par
-# des conditions d’utilisation du service, une politique de confidentialité et un support distincts.
-# documentation en ligne.
-
-# GitHub recommande d’épingler les actions à un SHA de commit.
-# Pour obtenir une version plus récente, vous devez mettre à jour le SHA.
-# Vous pouvez également référencer une balise ou une branche, mais l’action peut changer sans avertissement.
-
-name: Build and Deploy to GKE
+name: Docker
 
 on:
   push:
-    branches:
-      - main
-
-env:
-  PROJECT_ID: hrnet-379908    # Add your project ID here.
-  GKE_CLUSTER: devcluster    # Add your cluster name here.
-  GKE_ZONE: us-central1   # Add your cluster zone here.
-  DEPLOYMENT_NAME: production # Add your deployment name here.
-  IMAGE_FRONTEND: hrnet-frontend
-  IMAGE_BACKEND: hrnet-backend
-  IMAGE_MONGODB: hrnet-mongodb
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
-    runs-on: ubuntu-latest
-    environment: production
 
+  deploy:
+
+    name: Setup Gcloud Account
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
     steps:
-      - name: Checkout
+
+      - name: Login
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-        with:
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
 
-      # Configure Docker to use the gcloud command-line tool as a credential
-      # helper for authentication
-      - run: |-
-          gcloud --quiet auth configure-docker
+      - name: Test Docker image
+        run: docker run $IMAGE_NAME sh -c "go test -v"
 
-      # Get the GKE credentials so we can deploy to the cluster
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-        with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_ZONE }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
 
-      # Build and push the backend Docker image
-      - name: Build and push backend image
-        env:
-          IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_BACKEND }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |-
-          docker build -t $IMAGE_NAME:$IMAGE_TAG ./backend
-          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-          docker push $IMAGE_NAME
-
-      # Build and push the frontend Docker image
-      - name: Build and push frontend image
-        env:
-          IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_FRONTEND }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |-
-          docker build -t $IMAGE_NAME:$IMAGE_TAG ./frontend
-          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-          docker push $IMAGE_NAME
-
-      # Build and push the mongodb Docker image
-      # - name: Build and push mongodb image
-      #   env:
-      #     IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_MONGODB }}
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |-
-      #     docker build -t $IMAGE_NAME:$IMAGE_TAG ./mongodb
-      #     docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-      #     docker push $IMAGE_NAME
-
-      # Deploy the backend, frontend and mongodb services to the GKE cluster using the new images
-      - name: Deploy to GKE
-        run: |-
-          kubectl set image deployment/backend backend=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_BACKEND }}:${{ github.sha }}
-          kubectl set image deployment/frontend frontend=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
+      - name: Deploy Docker image
+        run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image $IMAGE_NAME --region us-central1 --platform managed

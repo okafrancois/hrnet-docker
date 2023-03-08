@@ -1,18 +1,10 @@
 version: "3.8"
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb_c
-    ports:
-      - "27017:27017"
-    restart: always
-    volumes:
-      - ./mongodb:/data/db
   backend:
     build: ./backend
     container_name: backend_c
     environment:
-      DATABASE_URL: "mongodb://mongodb_c:27017/hrnetDB"
+      DATABASE_URL: "mongodb+srv://okafrancois:yuYFt4YKfjL7uUAx@workplace.ed4lc85.mongodb.net/hrnetDB?retryWrites=true&w=majority"
       PORT: "3000"
     ports:
       - "3000:3000"
@@ -21,7 +13,7 @@ services:
       - /app/node_modules
     depends_on:
       - mongodb
-    command: /bin/sh -c "while ! nc -z mongodb_c 27017; do sleep 1; done; npm run dev:server"
+    command: npm run dev:server
   frontend:
     build: ./frontend
     container_name: frontend_c
