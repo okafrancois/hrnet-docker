@@ -1,30 +1,51 @@
-# Project #14 - HRnet Frontend
+HR-Net
+======
 
-This codebase contains the code needed to run HRnet front end and backend.
+HR-Net is a simple project that helps you manage your human resources. It is designed to make it easy for you to keep
+track of your employees' information, payroll, and other important HR-related data.
 
-## Getting Started
+Installation
+------------
 
-### Prerequisites
+To install HR-Net, you need to
+have [Docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) installed on your system.
 
-HRnet Frontend needs the backend to run. Please follow the instructions in the backend README in the `./backend` folder
-to get the backend running.
+Once you have those installed, you can clone this repository and run the following command:
 
-### Instructions
+Scripts
+-------
 
-1. Fork this repo
-2. Clone the repo onto your computer
-3. Open a terminal window in the cloned project
-4. Run the following commands:
+HR-Net comes with two scripts that you can use to manage the docker container (run in the root folder):
 
-```bash
-# Install dependencies
-npm install
+- `docker-compose up`: Starts the docker container and HR-Net in dev mode.
+- `docker-compose down`: Stops the docker container and HR-Net.
 
-# Start local dev server
-npm run dev
+Usage
+-----
 
-# Start local prod server
-npm run preview
-```
+Once the container build is finished, you can access the HR-Net web interface, simply navigate
+to `http://localhost:5173` in your web
+browser.
 
-Your server should now be running at http://locahost:5173
+You should have 15 employees and one user in your database:
+
+### Tony Stark
+
+- First Name: `Tony`
+- Last Name: `Stark`
+- Email: `tony@stark.com`
+- Password: `password123`
+
+Use these credentials to log in to the HR-Net web interface.
+
+## Production preview mode
+
+### requirements
+
+- [Node.js](https://nodejs.org/en/) (v12.16.1 or higher)
+- [npm](https://www.npmjs.com/) (v6.13.4 or higher)
+
+### steps
+
+1. Run `npm install` in the `./frontend` folder.
+2. Run `npm run preview` in the `./frontend` folder.

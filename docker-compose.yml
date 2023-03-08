@@ -9,7 +9,7 @@ services:
     volumes:
       - ./mongodb:/data/db
   backend:
-    build: backend
+    build: ./backend
     container_name: backend_c
     environment:
       DATABASE_URL: "mongodb://mongodb_c:27017/hrnetDB"

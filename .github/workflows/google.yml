@@ -15,11 +15,13 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  PROJECT_ID: hrnet-379908    # Add your project ID here.
   GKE_CLUSTER: devcluster    # Add your cluster name here.
   GKE_ZONE: us-central1   # Add your cluster zone here.
   DEPLOYMENT_NAME: production # Add your deployment name here.
-  IMAGE: static-site
+  IMAGE_FRONTEND: hrnet-frontend
+  IMAGE_BACKEND: hrnet-backend
+  IMAGE_MONGODB: hrnet-mongodb
 
 jobs:
   setup-build-publish-deploy:
@@ -69,14 +71,19 @@ jobs:
           docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
           docker push $IMAGE_NAME
 
-      # Deploy the backend and frontend services to the GKE cluster
-      - name: Deploy
+      # Build and push the mongodb Docker image
+      - name: Build and push mongodb image
         env:
-          BACKEND_NAME: backend
-          FRONTEND_NAME: frontend
+          IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_MONGODB }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |-
-          kubectl apply -f k8s/backend-deployment.yaml
-          kubectl apply -f k8s/frontend-deployment.yaml
-          kubectl apply -f k8s/mongodb-deployment.yaml
-          kubectl rollout status deployment/${BACKEND_NAME}
-          kubectl rollout status deployment/${FRONTEND_NAME}
+          docker build -t $IMAGE_NAME:$IMAGE_TAG ./mongodb
+          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+          docker push $IMAGE_NAME
+
+      # Deploy the backend, frontend and mongodb services to the GKE cluster using the new images
+      - name: Deploy to GKE
+        run: |-
+          kubectl set image deployment/backend backend=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_BACKEND }}:${{ github.sha }}
+          kubectl set image deployment/frontend frontend=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
+          kubectl set image deployment/mongodb mongodb=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_MONGODB }}:${{ github.sha }}
