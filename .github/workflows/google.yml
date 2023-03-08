@@ -72,18 +72,17 @@ jobs:
           docker push $IMAGE_NAME
 
       # Build and push the mongodb Docker image
-      - name: Build and push mongodb image
-        env:
-          IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_MONGODB }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |-
-          docker build -t $IMAGE_NAME:$IMAGE_TAG ./mongodb
-          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-          docker push $IMAGE_NAME
+      # - name: Build and push mongodb image
+      #   env:
+      #     IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_MONGODB }}
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   run: |-
+      #     docker build -t $IMAGE_NAME:$IMAGE_TAG ./mongodb
+      #     docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+      #     docker push $IMAGE_NAME
 
       # Deploy the backend, frontend and mongodb services to the GKE cluster using the new images
       - name: Deploy to GKE
         run: |-
           kubectl set image deployment/backend backend=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_BACKEND }}:${{ github.sha }}
           kubectl set image deployment/frontend frontend=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
-          kubectl set image deployment/mongodb mongodb=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_MONGODB }}:${{ github.sha }}
