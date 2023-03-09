@@ -56,7 +56,6 @@ jobs:
       # Deploy sample image to the GKE cluster
       - name: Deploy
         run: |-
-          cd frontend
-          kubectl apply -f ../frontend-deployment.yml
+          kubectl apply -f frontend-deployment.yml
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
