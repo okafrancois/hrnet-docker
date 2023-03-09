@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: hrnetfrontend
-          image: gcr.io/google-samples/hrnetfrontend:latest
+          image: gcr.io/hrnetapp/hrnetfrontend:latest
           ports:
             - containerPort: 8080
           resources:
