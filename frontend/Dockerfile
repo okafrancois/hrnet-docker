@@ -9,6 +9,6 @@ RUN npm install
 
 COPY / /app
 
-EXPOSE 5173
+EXPOSE $VITE_PORT
 
 CMD ["npm", "run", "dev"]

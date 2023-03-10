@@ -4,21 +4,22 @@ services:
     build: ./backend
     container_name: backend_c
     environment:
-      DATABASE_URL: "mongodb+srv://okafrancois:yuYFt4YKfjL7uUAx@workplace.ed4lc85.mongodb.net/hrnetDB?retryWrites=true&w=majority"
-      PORT: "3000"
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
     ports:
-      - "3000:3000"
+      - "${API_PORT}:${API_PORT}"
     volumes:
       - ./backend:/app
       - /app/node_modules
-    depends_on:
-      - mongodb
     command: npm run dev:server
   frontend:
     build: ./frontend
     container_name: frontend_c
+    environment:
+      VITE_PORT: ${VITE_PORT}
+      VITE_API_URL: ${VITE_API_URL}
     ports:
-      - "5173:5173"
+      - "${VITE_PORT}:${VITE_PORT}"
     volumes:
       - ./frontend:/app
       - /app/node_modules
