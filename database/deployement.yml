@@ -1,0 +1,59 @@
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "hrnetapp-config-aiyn"
+  namespace: "default"
+  labels:
+    app: "hrnetapp"
+data:
+  VITE_API_URL: "http://localhost:3000/api/v1"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "hrnetapp"
+  namespace: "default"
+  labels:
+    app: "hrnetapp"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "hrnetapp"
+  template:
+    metadata:
+      labels:
+        app: "hrnetapp"
+    spec:
+      containers:
+        - name: "hrnetfrontend-sha256-1"
+          image: "gcr.io/hrnetapp/hrnetfrontend@sha256:9be88ebf30d96c6c404ef5f4cc0837b0e83256979bf7ddbaf1543c3581f6b2ce"
+          env:
+            - name: "VITE_API_URL"
+              valueFrom:
+                configMapKeyRef:
+                  key: "VITE_API_URL"
+                  name: "hrnetapp-config-aiyn"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "hrnetapp-hpa-3c38"
+  namespace: "default"
+  labels:
+    app: "hrnetapp"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "hrnetapp"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 1
+  metrics:
+    - type: "Resource"
+      resource:
+        name: "cpu"
+        target:
+          type: "Utilization"
+          averageUtilization: 80
