@@ -24,7 +24,6 @@ env:
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
-    using: node:16
     runs-on: ubuntu-latest
     environment: production
 
