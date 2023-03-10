@@ -2,51 +2,51 @@
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
-  name: "hrnetserver-config-h4r0"
+  name: "hrnetapi-config-kpep"
   namespace: "default"
   labels:
-    app: "hrnetserver"
+    app: "hrnetapi"
 data:
   DATABASE_URL: "mongodb+srv://okafrancois:yuYFt4YKfjL7uUAx@workplace.ed4lc85.mongodb.net/hrnetDB?retryWrites=true&w=majority"
 ---
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: "hrnetserver"
+  name: "hrnetapi"
   namespace: "default"
   labels:
-    app: "hrnetserver"
+    app: "hrnetapi"
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: "hrnetserver"
+      app: "hrnetapi"
   template:
     metadata:
       labels:
-        app: "hrnetserver"
+        app: "hrnetapi"
     spec:
       containers:
         - name: "hrnetbackend-sha256-1"
-          image: "gcr.io/hrnetapp/hrnetbackend@sha256:f1afcef0ecc0a3f0f99c4ed6d9264680f60b4a26428b1433caa5d8aeda2fb141"
+          image: "gcr.io/hrnetapp/hrnetbackend@sha256:5252a3eac51d8e45560cd873afd46fc981725ce4215e37139e318a29c9fca13f"
           env:
             - name: "DATABASE_URL"
               valueFrom:
                 configMapKeyRef:
                   key: "DATABASE_URL"
-                  name: "hrnetserver-config-h4r0"
+                  name: "hrnetapi-config-kpep"
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"
 metadata:
-  name: "hrnetserver-hpa-qqra"
+  name: "hrnetapi-hpa-rbaq"
   namespace: "default"
   labels:
-    app: "hrnetserver"
+    app: "hrnetapi"
 spec:
   scaleTargetRef:
     kind: "Deployment"
-    name: "hrnetserver"
+    name: "hrnetapi"
     apiVersion: "apps/v1"
   minReplicas: 1
   maxReplicas: 5
