@@ -51,7 +51,6 @@ jobs:
 
       # Build the Docker image with latest tag
       - name: Build
-        context: ./frontend
         run: |-
           docker build \
             --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" \
