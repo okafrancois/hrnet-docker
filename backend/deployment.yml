@@ -2,54 +2,54 @@
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
-  name: "hrnetapp-config-aiyn"
+  name: "hrnetserver-config-h4r0"
   namespace: "default"
   labels:
-    app: "hrnetapp"
+    app: "hrnetserver"
 data:
-  VITE_API_URL: "http://localhost:3000/api/v1"
+  DATABASE_URL: "mongodb+srv://okafrancois:yuYFt4YKfjL7uUAx@workplace.ed4lc85.mongodb.net/hrnetDB?retryWrites=true&w=majority"
 ---
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: "hrnetapp"
+  name: "hrnetserver"
   namespace: "default"
   labels:
-    app: "hrnetapp"
+    app: "hrnetserver"
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: "hrnetapp"
+      app: "hrnetserver"
   template:
     metadata:
       labels:
-        app: "hrnetapp"
+        app: "hrnetserver"
     spec:
       containers:
-        - name: "hrnetfrontend-sha256-1"
-          image: "gcr.io/hrnetapp/hrnetfrontend@sha256:9be88ebf30d96c6c404ef5f4cc0837b0e83256979bf7ddbaf1543c3581f6b2ce"
+        - name: "hrnetbackend-sha256-1"
+          image: "gcr.io/hrnetapp/hrnetbackend@sha256:f1afcef0ecc0a3f0f99c4ed6d9264680f60b4a26428b1433caa5d8aeda2fb141"
           env:
-            - name: "VITE_API_URL"
+            - name: "DATABASE_URL"
               valueFrom:
                 configMapKeyRef:
-                  key: "VITE_API_URL"
-                  name: "hrnetapp-config-aiyn"
+                  key: "DATABASE_URL"
+                  name: "hrnetserver-config-h4r0"
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"
 metadata:
-  name: "hrnetapp-hpa-3c38"
+  name: "hrnetserver-hpa-qqra"
   namespace: "default"
   labels:
-    app: "hrnetapp"
+    app: "hrnetserver"
 spec:
   scaleTargetRef:
     kind: "Deployment"
-    name: "hrnetapp"
+    name: "hrnetserver"
     apiVersion: "apps/v1"
   minReplicas: 1
-  maxReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: "Resource"
       resource:
