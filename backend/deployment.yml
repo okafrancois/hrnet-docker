@@ -2,51 +2,51 @@
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
-  name: "nginx-1-config-vvk7"
+  name: "hrnetapi-config-fqhz"
   namespace: "default"
   labels:
-    app: "nginx-1"
+    app: "hrnetapi"
 data:
   DATABASE_URL: "mongodb+srv://okafrancois:yuYFt4YKfjL7uUAx@workplace.ed4lc85.mongodb.net/hrnetDB?retryWrites=true&w=majority"
 ---
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: "nginx-1"
+  name: "hrnetapi"
   namespace: "default"
   labels:
-    app: "nginx-1"
+    app: "hrnetapi"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "nginx-1"
+      app: "hrnetapi"
   template:
     metadata:
       labels:
-        app: "nginx-1"
+        app: "hrnetapi"
     spec:
       containers:
         - name: "hrnetbackend-sha256-1"
-          image: "gcr.io/hrnetapi/hrnetbackend@sha256:5456e140d633f51021d861567e4cc6b9fade9dae804f7ba986ea5acc75d610d0"
+          image: "gcr.io/hrnetapi/hrnetbackend@sha256:f694b6f39f5e1ed2e587948e55988d9529993526e371c6d4893d8bbe67c5e779"
           env:
             - name: "DATABASE_URL"
               valueFrom:
                 configMapKeyRef:
                   key: "DATABASE_URL"
-                  name: "nginx-1-config-vvk7"
+                  name: "hrnetapi-config-fqhz"
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"
 metadata:
-  name: "nginx-1-hpa-izzy"
+  name: "hrnetapi-hpa-vnm6"
   namespace: "default"
   labels:
-    app: "nginx-1"
+    app: "hrnetapi"
 spec:
   scaleTargetRef:
     kind: "Deployment"
-    name: "nginx-1"
+    name: "hrnetapi"
     apiVersion: "apps/v1"
   minReplicas: 1
   maxReplicas: 1
