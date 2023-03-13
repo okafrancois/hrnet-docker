@@ -17,7 +17,7 @@ metadata:
   labels:
     app: "hrnetfront"
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: "hrnetfront"
@@ -35,25 +35,3 @@ spec:
                 configMapKeyRef:
                   key: "VITE_API_URL"
                   name: "hrnetfront-config-tisj"
----
-apiVersion: "autoscaling/v2"
-kind: "HorizontalPodAutoscaler"
-metadata:
-  name: "hrnetfront-hpa-nr9j"
-  namespace: "default"
-  labels:
-    app: "hrnetfront"
-spec:
-  scaleTargetRef:
-    kind: "Deployment"
-    name: "hrnetfront"
-    apiVersion: "apps/v1"
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-    - type: "Resource"
-      resource:
-        name: "cpu"
-        target:
-          type: "Utilization"
-          averageUtilization: 80
