@@ -1,60 +1,52 @@
 ---
 apiVersion: "v1"
-kind: "Namespace"
-metadata:
-  name: "hrnet"
----
-apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
-  name: "hrnetfrontend-config-0uyq"
-  namespace: "hrnet"
+  name: "hrnetapp-config-aiyn"
+  namespace: "default"
   labels:
-    app: "hrnetfrontend"
+    app: "hrnetapp"
+data:
+  VITE_API_URL: "local.dev/api"
 ---
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: "hrnetfrontend"
-  namespace: "hrnet"
+  name: "hrnetapp"
+  namespace: "default"
   labels:
-    app: "hrnetfrontend"
+    app: "hrnetapp"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "hrnetfrontend"
+      app: "hrnetapp"
   template:
     metadata:
       labels:
-        app: "hrnetfrontend"
+        app: "hrnetapp"
     spec:
       containers:
-        - name: "hrnetfrontend-1"
+        - name: "hrnetfrontend-sha256-1"
           image: "gcr.io/hrnetapp/hrnetfrontend:latest"
           env:
             - name: "VITE_API_URL"
               valueFrom:
                 configMapKeyRef:
                   key: "VITE_API_URL"
-                  name: "hrnetfrontend-config-0uyq"
-            - name: "VITE_PORT"
-              valueFrom:
-                configMapKeyRef:
-                  key: "VITE_PORT"
-                  name: "hrnetfrontend-config-0uyq"
+                  name: "hrnetapp-config-aiyn"
 ---
 apiVersion: "autoscaling/v2"
 kind: "HorizontalPodAutoscaler"
 metadata:
-  name: "hrnetfrontend-hpa-es7k"
-  namespace: "hrnet"
+  name: "hrnetapp-hpa-3c38"
+  namespace: "default"
   labels:
-    app: "hrnetfrontend"
+    app: "hrnetapp"
 spec:
   scaleTargetRef:
     kind: "Deployment"
-    name: "hrnetfrontend"
+    name: "hrnetapp"
     apiVersion: "apps/v1"
   minReplicas: 1
   maxReplicas: 1
