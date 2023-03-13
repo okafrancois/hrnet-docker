@@ -68,9 +68,8 @@ jobs:
           docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
           docker push "gcr.io/$PROJECT_ID/$IMAGE:latest"
 
-      # Deploy the Docker image to the GKE cluster
-      - name: Deploy
+      # Get the current deployment and save it to a file in /frontend/deployment.yaml and then update the image
+      - name: Update Deployment
         run: |-
-          kubectl apply -f frontend/deployment.yml
-          kubectl rollout status deployment/$DEPLOYMENT_NAME
-          kubectl get services -o wide
+          kubectl get deployment $DEPLOYMENT_NAME -o yaml > frontenddeploy.yaml
+          sed -i "s|image: gcr.io/$PROJECT_ID/$IMAGE:.*|image: gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA|g" frontenddeploy.yaml
