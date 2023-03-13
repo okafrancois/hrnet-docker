@@ -18,7 +18,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_FRONTEND_PROJECT }}
   GKE_CLUSTER: ${{ secrets.GKE_FRONTEND_CLUSTER }}    # Add your cluster name here.
   GKE_ZONE: us-central1   # Add your cluster zone here.
-  DEPLOYMENT_NAME: hrnetfrontend # Add your deployment name here.
+  DEPLOYMENT_NAME: hrnetapp # Add your deployment name here.
   IMAGE: hrnetfrontend
   VITE_PORT: 80
 

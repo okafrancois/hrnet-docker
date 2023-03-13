@@ -1,59 +1,93 @@
----
-apiVersion: "v1"
-kind: "ConfigMap"
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: "hrnetapp-config-aiyn"
-  namespace: "default"
+  annotations:
+    autopilot.gke.io/resource-adjustment: '{"input":{"containers":[{"name":"hrnetfrontend-sha256-1"}]},"output":{"containers":[{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"2Gi"},"requests":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"2Gi"},"name":"hrnetfrontend-sha256-1"}]},"modified":true}'
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2023-03-13T14:32:35Z"
+  generation: 2
   labels:
-    app: "hrnetapp"
-data:
-  VITE_API_URL: "local.dev/api"
----
-apiVersion: "apps/v1"
-kind: "Deployment"
-metadata:
-  name: "hrnetapp"
-  namespace: "default"
-  labels:
-    app: "hrnetapp"
+    app: hrnetfrontend
+  name: hrnetfrontend
+  namespace: default
+  resourceVersion: "13078"
+  uid: 6f9d5ab6-5646-4519-86c4-9410011802cf
 spec:
+  progressDeadlineSeconds: 600
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: "hrnetapp"
+      app: hrnetfrontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: "hrnetapp"
+        app: hrnetfrontend
     spec:
       containers:
-        - name: "hrnetfrontend-sha256-1"
-          image: "gcr.io/hrnetapp/hrnetfrontend:latest"
-          env:
-            - name: "VITE_API_URL"
+        - env:
+            - name: VITE_API_URL
               valueFrom:
                 configMapKeyRef:
-                  key: "VITE_API_URL"
-                  name: "hrnetapp-config-aiyn"
----
-apiVersion: "autoscaling/v2"
-kind: "HorizontalPodAutoscaler"
-metadata:
-  name: "hrnetapp-hpa-3c38"
-  namespace: "default"
-  labels:
-    app: "hrnetapp"
-spec:
-  scaleTargetRef:
-    kind: "Deployment"
-    name: "hrnetapp"
-    apiVersion: "apps/v1"
-  minReplicas: 1
-  maxReplicas: 1
-  metrics:
-    - type: "Resource"
-      resource:
-        name: "cpu"
-        target:
-          type: "Utilization"
-          averageUtilization: 80
+                  key: VITE_API_URL
+                  name: hrnetfrontend-config-vbp2
+            - name: VITE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: VITE_PORT
+                  name: hrnetfrontend-config-vbp2
+          image: gcr.io/hrnetapp/hrnetfrontend@sha256:486b168f135f2d805904039f785a65144a2b3c29c94c89855282c0b6583e8a3f
+          imagePullPolicy: IfNotPresent
+          name: hrnetfrontend-sha256-1
+          resources:
+            limits:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+          securityContext:
+            capabilities:
+              drop:
+                - NET_RAW
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Equal
+          value: amd64
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: "2023-03-13T14:36:08Z"
+      lastUpdateTime: "2023-03-13T14:36:08Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2023-03-13T14:32:35Z"
+      lastUpdateTime: "2023-03-13T14:36:09Z"
+      message: ReplicaSet "hrnetfrontend-65b697c5d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
