@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: "hrnetfrontend-sha256-1"
-          image: "gcr.io/hrnetapp/hrnetfrontend@sha256:759a93baec7ebb38a5c8070db6af5834d8911e3574873fba6ae3621f3cecabfd"
+          image: "gcr.io/hrnetapp/hrnetfrontend:latest"
           env:
             - name: "VITE_API_URL"
               valueFrom:
