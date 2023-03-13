@@ -68,8 +68,7 @@ jobs:
           docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
           docker push "gcr.io/$PROJECT_ID/$IMAGE:latest"
 
-      # Deploy the Docker image to the GKE cluster
+      # Update the deployment with the new image
       - name: Deploy
         run: |-
-          kubectl set image deployment/$DEPLOYMENT_NAME $DEPLOYMENT_NAME="gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" --namespace=hrnetfrontend
-          kubectl rollout status deployment/$DEPLOYMENT_NAME
+          kubectl set image deployment/$DEPLOYMENT_NAME $DEPLOYMENT_NAME="gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
