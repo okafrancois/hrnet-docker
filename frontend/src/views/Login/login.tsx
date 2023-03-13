@@ -45,7 +45,7 @@ const Login = () => {
         <Layout containerClass={"login-view"} header={false}>
             <div className="login-view__headings">
                 <img src={logo} alt="" className="login-view__logo"/>
-                <h1 className="login-view__title">Welcome back on HRnet !</h1>
+                <h1 className="login-view__title">Welcome back to HRnet !</h1>
             </div>
             <form className="login-view__form login-form" onSubmit={handleSubmit}>
                 <label className={"login-form__field email"}>
