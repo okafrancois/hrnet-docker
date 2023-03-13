@@ -1,59 +1,31 @@
----
-apiVersion: "v1"
-kind: "ConfigMap"
-metadata:
-  name: "hrnetfront-config-tisj"
-  namespace: "default"
-  labels:
-    app: "hrnetfront"
-data:
-  VITE_API_URL: "dev.com/"
----
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   name: "hrnetfront"
   namespace: "default"
   labels:
-    app: "hrnetfront"
+    app: "hrnetfrontend"
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: "hrnetfront"
+      app: "hrnetfrontend"
   template:
     metadata:
       labels:
-        app: "hrnetfront"
+        app: "hrnetfrontend"
     spec:
       containers:
-        - name: "hrnetfrontend-sha256-1"
-          image: "gcr.io/hrnetapp/hrnetfrontend@sha256:759a93baec7ebb38a5c8070db6af5834d8911e3574873fba6ae3621f3cecabfd"
+        - name: "hrnetfrontend-1"
+          image: "gcr.io/hrnetapp/hrnetfrontend:latest"
           env:
             - name: "VITE_API_URL"
               valueFrom:
                 configMapKeyRef:
                   key: "VITE_API_URL"
-                  name: "hrnetfront-config-tisj"
----
-apiVersion: "autoscaling/v2"
-kind: "HorizontalPodAutoscaler"
-metadata:
-  name: "hrnetfront-hpa-nr9j"
-  namespace: "default"
-  labels:
-    app: "hrnetfront"
-spec:
-  scaleTargetRef:
-    kind: "Deployment"
-    name: "hrnetfront"
-    apiVersion: "apps/v1"
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-    - type: "Resource"
-      resource:
-        name: "cpu"
-        target:
-          type: "Utilization"
-          averageUtilization: 80
+                  name: "hrnetfrontend-config-vbp2"
+            - name: "VITE_PORT"
+              valueFrom:
+                configMapKeyRef:
+                  key: "VITE_PORT"
+                  name: "hrnetfrontend-config-vbp2"
